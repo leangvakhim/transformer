@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Attention Mechanism</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-container {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        /* Math specific styles */
+        .math-frac {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 0.25rem;
+        }
+
+        .math-num {
+            border-bottom: 2px solid #374151;
+            padding: 0 0.25rem;
+        }
+
+        .math-den {
+            padding: 0 0.25rem;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4 font-sans text-gray-800">
+
+    <div
+        class="bg-white rounded-2xl shadow-xl border border-gray-100 w-full max-w-4xl overflow-hidden flex flex-col min-h-[600px]">
+
+        <!-- Header -->
+        <div class="bg-white border-b border-gray-100 px-8 py-6">
+            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">The Attention Mechanism</h1>
+            <p class="text-gray-500 mt-1">How AI understands the context of words</p>
+
+            <!-- Progress Bar -->
+            <div class="flex items-center gap-2 mt-6">
+                <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden flex" id="progress-bar">
+                    <!-- Progress segments injected by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-1 px-8 py-8 flex flex-col" id="content-area">
+            <!-- Dynamic content injected by JS -->
+        </div>
+
+        <!-- Footer / Controls -->
+        <div class="bg-gray-50 px-8 py-5 border-t border-gray-200 flex justify-between items-center">
+            <button id="btn-prev"
+                class="px-6 py-2.5 rounded-lg font-medium text-gray-600 bg-white border border-gray-300 hover:bg-gray-50 hover:text-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                &larr; Back
+            </button>
+            <div id="step-counter" class="text-sm font-medium text-gray-500">
+                Step 1 of 6
+            </div>
+            <button id="btn-next"
+                class="px-6 py-2.5 rounded-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                Next Step &rarr;
+            </button>
+        </div>
+    </div>
+
+    <script src="../js/attention_mechanism.js"></script>
+</body>
+
+</html>

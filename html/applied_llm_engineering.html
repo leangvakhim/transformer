@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applied LLM Engineering: Step-by-Step</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- KaTeX for rendering mathematical equations -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Font Awesome for simple icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.4s ease-out forwards',
+                        'slide-up': 'slideUp 0.4s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+            animation: slideUp 0.4s ease-out forwards;
+        }
+    </style>
+</head>
+
+<body class="bg-white text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-10">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-2 text-brand-700">
+                <i class="fa-solid fa-brain text-2xl"></i>
+                <h1 class="text-xl font-bold tracking-tight">Applied LLM Engineering</h1>
+            </div>
+            <div class="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+                Interactive Concept Guide
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex flex-col max-w-5xl mx-auto w-full px-4 py-8">
+
+        <!-- Progress Bar -->
+        <div class="mb-8 relative">
+            <div class="overflow-hidden h-2 mb-4 text-xs flex rounded-full bg-slate-100">
+                <div id="progress-bar" style="width: 16.66%"
+                    class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-brand-500 transition-all duration-500">
+                </div>
+            </div>
+            <div class="flex justify-between text-xs font-semibold text-slate-400" id="step-indicators">
+                <!-- Indicators injected via JS -->
+            </div>
+        </div>
+
+        <!-- Step Container -->
+        <div id="step-container"
+            class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 min-h-[450px] flex flex-col">
+
+            <div class="mb-6 border-b border-slate-100 pb-4">
+                <span id="step-badge"
+                    class="inline-block bg-brand-50 text-brand-700 text-xs px-2 py-1 rounded-md font-bold mb-2 uppercase tracking-wide">Step
+                    1</span>
+                <h2 id="step-title" class="text-3xl font-extrabold text-slate-900">Title goes here</h2>
+                <p id="step-desc" class="text-lg text-slate-500 mt-2">Description goes here.</p>
+            </div>
+
+            <div id="step-visual" class="flex-grow flex items-center justify-center py-8">
+                <!-- Visuals injected via JS -->
+            </div>
+
+        </div>
+
+        <!-- Navigation Controls -->
+        <div class="flex items-center justify-between mt-8">
+            <button id="btn-back" onclick="prevStep()"
+                class="flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold text-slate-600 bg-white border border-slate-300 hover:bg-slate-50 hover:text-slate-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Previous Step</span>
+            </button>
+            <div class="text-sm font-medium text-slate-400" id="step-counter">
+                1 / 6
+            </div>
+            <button id="btn-next" onclick="nextStep()"
+                class="flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                <span>Next Step</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+
+    </main>
+
+    <script src="../js/applied_llm_engineering.js"></script>
+</body>
+
+</html>

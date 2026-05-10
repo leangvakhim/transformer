@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hugging Face Ecosystem Journey</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- KaTeX for beautiful math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        hfYellow: '#FFD21E',
+                        hfDark: '#111827',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .fade-enter {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .fade-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 300ms, transform 300ms;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex items-center justify-center p-4">
+
+    <!-- Main Container -->
+    <div
+        class="max-w-3xl w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 flex flex-col min-h-[500px]">
+
+        <!-- Header -->
+        <div class="bg-white px-8 pt-8 pb-4 border-b border-gray-100 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-hfYellow rounded-full flex items-center justify-center text-xl shadow-sm">
+                    🤗
+                </div>
+                <h1 class="text-2xl font-bold text-hfDark">Hugging Face Ecosystem</h1>
+            </div>
+            <div class="text-sm font-medium text-gray-400" id="step-counter">
+                Step 1 of 6
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-gray-100 h-1.5">
+            <div id="progress-bar" class="bg-hfYellow h-1.5 transition-all duration-300 w-1/6"></div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="p-8 flex-grow flex flex-col justify-center relative">
+            <div id="content-wrapper" class="transition-opacity duration-300">
+                <!-- Icon -->
+                <div id="step-icon"
+                    class="w-16 h-16 bg-yellow-50 text-yellow-600 rounded-xl flex items-center justify-center mb-6 shadow-sm">
+                    <!-- SVG injected here -->
+                </div>
+
+                <!-- Title & Text -->
+                <h2 id="step-title" class="text-3xl font-bold text-gray-900 mb-4"></h2>
+                <p id="step-description" class="text-lg text-gray-600 leading-relaxed"></p>
+
+                <!-- Equation Area (Hidden by default) -->
+                <div id="step-equation" class="mt-8 p-6 bg-gray-50 border border-gray-200 rounded-xl hidden">
+                    <!-- Equation injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Navigation -->
+        <div class="px-8 py-6 bg-gray-50 border-t border-gray-100 flex justify-between items-center rounded-b-2xl">
+            <button id="btn-prev" onclick="changeStep(-1)"
+                class="px-6 py-2.5 rounded-lg font-medium text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                Back
+            </button>
+
+            <div id="dots-container" class="flex space-x-2 hidden sm:flex">
+                <!-- Dots injected here -->
+            </div>
+
+            <button id="btn-next" onclick="changeStep(1)"
+                class="px-6 py-2.5 rounded-lg font-medium bg-hfDark text-white hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md">
+                Next Step
+            </button>
+        </div>
+    </div>
+
+    <script src="../js/hugging_face_ecosystem.js"></script>
+</body>
+
+</html>

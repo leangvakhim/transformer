@@ -1,0 +1,294 @@
+// Define the steps data
+const stepsData = [
+    {
+        id: 1,
+        title: "The Foundation: Foundation Models",
+        desc: "Before 'Applied Engineering', there's the Base LLM. It's trained on massive amounts of text using next-token prediction. It knows language, but doesn't know how to follow specific instructions yet.",
+        visual: `
+            <div class="flex items-center space-x-6">
+                <div class="w-32 h-32 rounded-lg bg-slate-100 border-2 border-slate-300 border-dashed flex items-center justify-center flex-col text-slate-400">
+                    <i class="fa-solid fa-database text-3xl mb-2"></i>
+                    <span class="text-sm font-bold text-center">Terabytes of<br>Internet Text</span>
+                </div>
+                <i class="fa-solid fa-arrow-right text-brand-500 text-2xl"></i>
+                <div class="w-40 h-40 rounded-full bg-brand-50 border-4 border-brand-500 flex items-center justify-center flex-col shadow-lg relative animate-fade-in">
+                    <i class="fa-solid fa-network-wired text-brand-600 text-4xl mb-2"></i>
+                    <span class="font-bold text-brand-800 text-center leading-tight">Base LLM<br><span class="text-xs font-normal opacity-75">(Transformer)</span></span>
+                    <div class="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 text-[10px] font-bold px-2 py-1 rounded-full shadow">Next Token Predictor</div>
+                </div>
+            </div>
+        `
+    },
+    {
+        id: 2,
+        title: "Prompt Engineering & In-Context Learning",
+        desc: "The simplest form of Applied LLM Engineering. Instead of retraining the model, we craft detailed instructions and provide examples in the prompt to guide its behavior at runtime.",
+        visual: `
+            <div class="flex flex-col space-y-4 w-full max-w-md animate-fade-in">
+                <div class="bg-brand-50 p-4 rounded-lg border border-brand-200 shadow-sm relative">
+                    <div class="absolute -left-3 -top-3 bg-brand-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold border-2 border-white shadow-sm">1</div>
+                    <p class="text-sm font-mono text-brand-800"><span class="font-bold text-brand-600">System:</span> You are an expert code reviewer.</p>
+                    <p class="text-sm font-mono text-brand-800 mt-2"><span class="font-bold text-brand-600">Context:</span> Example A -> Good, Example B -> Bad.</p>
+                    <p class="text-sm font-mono text-brand-800 mt-2"><span class="font-bold text-brand-600">User:</span> Review this code: \`print("hi")\`</p>
+                </div>
+                <div class="flex justify-center text-slate-300">
+                    <i class="fa-solid fa-arrow-down text-xl"></i>
+                </div>
+                <div class="bg-slate-800 p-4 rounded-lg border border-slate-700 shadow-sm relative">
+                    <div class="absolute -left-3 -top-3 bg-slate-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold border-2 border-white shadow-sm">2</div>
+                    <p class="text-sm font-mono text-emerald-400"><span class="font-bold text-slate-400">LLM Output:</span> This code is simple and works. Good job.</p>
+                </div>
+            </div>
+        `
+    },
+    {
+        id: 3,
+        title: "RAG (Retrieval-Augmented Generation)",
+        desc: "LLMs hallucinate and don't know your private data. RAG fixes this by searching a database for facts *before* generating an answer, giving the LLM an 'open-book' exam.",
+        visual: `
+            <div class="flex flex-col items-center space-y-6 w-full animate-fade-in">
+                <div class="flex items-center justify-center space-x-4 w-full">
+                    <!-- User Query -->
+                    <div class="bg-slate-100 p-3 rounded-lg border border-slate-300 w-1/4 text-center">
+                        <i class="fa-solid fa-user text-slate-500 mb-1"></i>
+                        <p class="text-xs font-bold text-slate-700">"What is our company policy on PTO?"</p>
+                    </div>
+
+                    <!-- Search -->
+                    <div class="flex flex-col items-center">
+                        <i class="fa-solid fa-arrow-right text-slate-300 text-sm mb-1"></i>
+                        <i class="fa-solid fa-magnifying-glass text-brand-500"></i>
+                        <i class="fa-solid fa-arrow-right text-slate-300 text-sm mt-1"></i>
+                    </div>
+
+                    <!-- Vector DB -->
+                    <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-200 w-1/4 text-center shadow-inner">
+                        <i class="fa-solid fa-cubes-stacked text-indigo-500 mb-1"></i>
+                        <p class="text-xs font-bold text-indigo-800">Vector Database<br><span class="font-normal text-[10px]">(Company Docs)</span></p>
+                    </div>
+                </div>
+
+                <!-- Retrieved Context + Query -->
+                <div class="flex flex-col items-center w-full">
+                    <i class="fa-solid fa-arrow-down text-brand-500 text-xl mb-2"></i>
+                    <div class="bg-brand-600 text-white p-4 rounded-xl shadow-md flex items-center space-x-4 w-2/3 justify-between">
+                        <div class="text-left w-2/3">
+                            <p class="text-[10px] uppercase font-bold text-brand-200 tracking-wider">Augmented Prompt sent to LLM</p>
+                            <p class="text-xs mt-1 font-mono">Context: "Employees get 20 PTO days..."</p>
+                            <p class="text-xs mt-1 font-mono">Question: "What is PTO policy?"</p>
+                        </div>
+                        <i class="fa-solid fa-robot text-3xl text-brand-200"></i>
+                    </div>
+                </div>
+            </div>
+        `
+    },
+    {
+        id: 4,
+        title: "Fine-Tuning & PEFT (LoRA)",
+        desc: "When prompt engineering isn't enough to capture a specific tone or complex task, we fine-tune. Instead of retraining the whole massive model, Parameter-Efficient Fine-Tuning (PEFT/LoRA) adds tiny, trainable 'adapter' layers.",
+        visual: `
+            <div class="flex items-center justify-center space-x-8 animate-fade-in">
+                <!-- Full Model -->
+                <div class="relative">
+                    <div class="w-48 h-64 bg-slate-200 rounded-lg flex flex-col justify-between p-2 shadow-inner border border-slate-300">
+                        <div class="h-4 bg-slate-300 rounded mb-1"></div>
+                        <div class="h-4 bg-slate-300 rounded mb-1"></div>
+                        <div class="h-4 bg-slate-300 rounded mb-1"></div>
+                        <div class="flex-grow flex items-center justify-center">
+                            <span class="text-slate-500 font-bold text-center">Frozen Base Model<br><span class="text-xs font-normal">(Weights locked)</span></span>
+                        </div>
+                        <div class="h-4 bg-slate-300 rounded mt-1"></div>
+                        <div class="h-4 bg-slate-300 rounded mt-1"></div>
+                    </div>
+                    <!-- LoRA Adapters attached -->
+                    <div class="absolute top-12 -right-4 w-12 h-8 bg-brand-500 rounded-md border-2 border-white shadow-lg flex items-center justify-center">
+                        <span class="text-white text-[10px] font-bold">LoRA</span>
+                    </div>
+                    <div class="absolute bottom-16 -right-4 w-12 h-8 bg-brand-500 rounded-md border-2 border-white shadow-lg flex items-center justify-center">
+                        <span class="text-white text-[10px] font-bold">LoRA</span>
+                    </div>
+                </div>
+
+                <div class="max-w-xs text-sm text-slate-600 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                    <p class="mb-2"><strong class="text-brand-600">How LoRA works:</strong> It injects trainable rank decomposition matrices into each layer of the Transformer architecture.</p>
+                    <p><strong>Result:</strong> Train on a single consumer GPU instead of a massive server farm!</p>
+                </div>
+            </div>
+        `
+    },
+    {
+        id: 5,
+        title: "The Core Equation: Scaled Dot-Product Attention",
+        desc: "At the heart of every Transformer LLM is the Attention Mechanism. It allows the model to look at the surrounding words to derive the true meaning and context of a specific word.",
+        visual: `
+            <div class="w-full flex flex-col items-center animate-fade-in">
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 w-full text-center">
+                    <div class="text-2xl font-serif text-slate-800 mb-4 math-render">
+                        $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\right)V$$
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 w-full">
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                        <h4 class="font-bold text-blue-800 flex items-center"><span class="bg-blue-200 text-blue-800 w-6 h-6 flex items-center justify-center rounded-full mr-2 text-sm">Q</span> Query</h4>
+                        <p class="text-xs text-blue-600 mt-2">"What am I looking for?" Represents the current token/word being processed.</p>
+                    </div>
+                    <div class="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                        <h4 class="font-bold text-amber-800 flex items-center"><span class="bg-amber-200 text-amber-800 w-6 h-6 flex items-center justify-center rounded-full mr-2 text-sm">K</span> Key</h4>
+                        <p class="text-xs text-amber-600 mt-2">"What do I have?" Represents all other tokens in the sequence.</p>
+                    </div>
+                    <div class="bg-emerald-50 p-4 rounded-lg border border-emerald-100">
+                        <h4 class="font-bold text-emerald-800 flex items-center"><span class="bg-emerald-200 text-emerald-800 w-6 h-6 flex items-center justify-center rounded-full mr-2 text-sm">V</span> Value</h4>
+                        <p class="text-xs text-emerald-600 mt-2">"What is the actual content?" The actual information we extract based on the Q & K match.</p>
+                    </div>
+                </div>
+                <div class="mt-4 text-sm text-slate-500 text-center max-w-lg">
+                    The dot product <span class="math-render inline">\\( QK^T \\)</span> calculates the "relevance" score between words. We scale it down by <span class="math-render inline">\\( \\sqrt{d_k} \\)</span> to keep gradients stable, apply <b>softmax</b> to turn scores into probabilities (0 to 1), and multiply by <b>V</b> to get the final representation!
+                </div>
+            </div>
+        `
+    },
+    {
+        id: 6,
+        title: "Optimization & Deployment",
+        desc: "Taking the model from research to production requires serving it efficiently. We use techniques to shrink the model size and speed up inference times so it runs fast and cheap.",
+        visual: `
+            <div class="flex flex-col items-center space-y-6 w-full animate-fade-in">
+
+                <div class="flex items-center justify-center space-x-6 w-full">
+                    <!-- Large Weights -->
+                    <div class="flex flex-col items-center">
+                        <div class="grid grid-cols-3 gap-1 bg-slate-100 p-2 rounded border border-slate-300 shadow-sm">
+                            <div class="w-8 h-8 bg-slate-400 text-[8px] text-white flex items-center justify-center rounded font-mono">1.234</div>
+                            <div class="w-8 h-8 bg-slate-400 text-[8px] text-white flex items-center justify-center rounded font-mono">0.912</div>
+                            <div class="w-8 h-8 bg-slate-400 text-[8px] text-white flex items-center justify-center rounded font-mono">-0.45</div>
+                        </div>
+                        <span class="text-xs font-bold text-slate-500 mt-2">FP16 (16-bit)</span>
+                    </div>
+
+                    <!-- Quantization process -->
+                    <div class="flex flex-col items-center">
+                        <span class="bg-brand-100 text-brand-700 text-[10px] font-bold px-2 py-1 rounded-full mb-1">Quantization</span>
+                        <i class="fa-solid fa-compress-arrows-alt text-brand-500 text-2xl"></i>
+                    </div>
+
+                    <!-- Small Weights -->
+                    <div class="flex flex-col items-center">
+                        <div class="grid grid-cols-3 gap-1 bg-brand-50 p-2 rounded border border-brand-200 shadow-sm">
+                            <div class="w-6 h-6 bg-brand-500 text-[10px] text-white flex items-center justify-center rounded font-bold">1</div>
+                            <div class="w-6 h-6 bg-brand-500 text-[10px] text-white flex items-center justify-center rounded font-bold">1</div>
+                            <div class="w-6 h-6 bg-brand-500 text-[10px] text-white flex items-center justify-center rounded font-bold">0</div>
+                        </div>
+                        <span class="text-xs font-bold text-brand-600 mt-2">INT4 (4-bit)</span>
+                    </div>
+                </div>
+
+                <div class="w-full h-px bg-slate-100 my-2"></div>
+
+                <!-- Serving Engine -->
+                <div class="bg-slate-800 text-white p-4 rounded-xl shadow-lg w-2/3 flex items-center justify-between border-t-4 border-brand-500">
+                    <div>
+                        <h4 class="font-bold text-lg">Inference Engine <span class="text-xs font-normal text-slate-400 ml-2">(e.g., vLLM, TensorRT)</span></h4>
+                        <p class="text-xs text-slate-300 mt-1">Batches requests dynamically to maximize GPU usage.</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fa-solid fa-server text-3xl text-brand-400"></i>
+                        <div class="flex space-x-1 mt-2 justify-center">
+                            <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+                            <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse" style="animation-delay: 150ms;"></div>
+                            <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse" style="animation-delay: 300ms;"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        `
+    }
+];
+
+let currentStepIndex = 0;
+
+// Elements
+const titleEl = document.getElementById('step-title');
+const descEl = document.getElementById('step-desc');
+const visualEl = document.getElementById('step-visual');
+const badgeEl = document.getElementById('step-badge');
+const counterEl = document.getElementById('step-counter');
+const btnNext = document.getElementById('btn-next');
+const btnBack = document.getElementById('btn-back');
+const progressBar = document.getElementById('progress-bar');
+const indicatorsContainer = document.getElementById('step-indicators');
+
+function init() {
+    // Setup indicators
+    stepsData.forEach((_, index) => {
+        const dot = document.createElement('div');
+        dot.innerText = `Step ${index + 1}`;
+        indicatorsContainer.appendChild(dot);
+    });
+    renderStep();
+}
+
+function renderStep() {
+    const step = stepsData[currentStepIndex];
+
+    // Content updates
+    badgeEl.innerText = `Step ${step.id}`;
+    titleEl.innerText = step.title;
+    descEl.innerText = step.desc;
+
+    // Remove animation class to restart it
+    visualEl.classList.remove('animate-fade-in');
+    // Force reflow
+    void visualEl.offsetWidth;
+
+    visualEl.innerHTML = step.visual;
+
+    // Re-render Math if present (KaTeX)
+    if (visualEl.querySelector('.math-render')) {
+        renderMathInElement(visualEl, {
+            delimiters: [
+                { left: '$$', right: '$$', display: true },
+                { left: '\\(', right: '\\)', display: false }
+            ],
+            throwOnError: false
+        });
+    }
+
+    // Update UI state
+    counterEl.innerText = `${currentStepIndex + 1} / ${stepsData.length}`;
+    progressBar.style.width = `${((currentStepIndex + 1) / stepsData.length) * 100}%`;
+
+    // Button states
+    btnBack.disabled = currentStepIndex === 0;
+
+    if (currentStepIndex === stepsData.length - 1) {
+        btnNext.disabled = true;
+        btnNext.innerHTML = `<i class="fa-solid fa-check mr-2"></i> Finished`;
+        btnNext.classList.replace('bg-brand-600', 'bg-emerald-600');
+        btnNext.classList.replace('hover:bg-brand-700', 'hover:bg-emerald-700');
+    } else {
+        btnNext.disabled = false;
+        btnNext.innerHTML = `<span>Next Step</span> <i class="fa-solid fa-arrow-right"></i>`;
+        btnNext.classList.replace('bg-emerald-600', 'bg-brand-600');
+        btnNext.classList.replace('hover:bg-emerald-700', 'hover:bg-brand-700');
+    }
+}
+
+function nextStep() {
+    if (currentStepIndex < stepsData.length - 1) {
+        currentStepIndex++;
+        renderStep();
+    }
+}
+
+function prevStep() {
+    if (currentStepIndex > 0) {
+        currentStepIndex--;
+        renderStep();
+    }
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', init);
