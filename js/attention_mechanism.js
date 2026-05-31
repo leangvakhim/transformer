@@ -1,3 +1,4 @@
+// <!-- JavaScript code consolidated into the single file -->
 // Data for the visualization steps
 const steps = [
     {
@@ -72,13 +73,23 @@ const steps = [
                         <div class="flex-1 border-b-2 border-dashed border-gray-200"></div>
                         <span class="font-mono font-bold text-gray-700">5</span>
                     </div>
-                    <div class="flex items-center gap-4 bg-emerald-50 border border-emerald-200 p-3 rounded-lg shadow-md transform scale-105 transition-transform">
+                    <div class="flex items-center gap-4 bg-emerald-50 border border-emerald-200 p-3 rounded-lg shadow-md transform scale-105 transition-transform relative">
                         <span class="font-bold text-amber-600 bg-amber-100 px-2 py-1 rounded">Q (bank)</span>
                         <span class="text-gray-400">×</span>
                         <span class="font-bold text-sky-600 bg-sky-100 px-2 py-1 rounded">K (river)</span>
                         <div class="flex-1 border-b-2 border-emerald-300"></div>
                         <span class="font-mono font-bold text-emerald-700 text-lg">150</span>
                         <span class="text-xs text-emerald-600 font-bold ml-2">High Match!</span>
+                    </div>
+
+                    <!-- New Button added exclusively to step 3 per user request -->
+                    <div class="text-center pt-4">
+                        <button onclick="window.open('./attention_visualization.html', '_blank')" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-100 text-indigo-700 font-semibold rounded-lg hover:bg-indigo-200 border border-indigo-200 transition-colors shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                            Attentions Visualizer
+                        </button>
                     </div>
                 </div>
             </div>
@@ -90,7 +101,6 @@ const steps = [
         render: () => `
             <div class="flex-1 flex flex-col gap-6 step-container items-center justify-center">
                 <div class="w-full max-w-2xl bg-white border-2 border-gray-100 rounded-xl p-6 shadow-sm relative overflow-hidden">
-
                     <!-- Visualization Bars -->
                     <div class="space-y-4 relative z-10">
                         <div class="flex items-center gap-4">
@@ -132,7 +142,6 @@ const steps = [
         render: () => `
             <div class="flex-1 flex flex-col gap-6 step-container items-center justify-center">
                 <div class="flex gap-4 items-center w-full max-w-3xl">
-
                     <!-- Weights * Values -->
                     <div class="flex flex-col gap-3 flex-1">
                         <div class="flex items-center justify-between bg-gray-50 p-2 rounded text-sm text-gray-500 border border-gray-100">
@@ -156,7 +165,6 @@ const steps = [
                             It now mathematically knows it is a <strong>water-related bank</strong>, not a financial one!
                         </div>
                     </div>
-
                 </div>
             </div>
         `
@@ -166,10 +174,9 @@ const steps = [
         description: "Putting it all together, here is the official formula used in Large Language Models (like Transformers) to calculate Attention:",
         render: () => `
             <div class="flex-1 flex flex-col gap-6 step-container h-full">
-
                 <!-- Equation Box -->
                 <div class="bg-white border border-gray-200 shadow-sm rounded-xl p-8 flex justify-center items-center my-2">
-                    <div class="text-2xl md:text-3xl text-gray-800 font-serif flex items-center gap-2">
+                    <div class="text-2xl md:text-3xl text-gray-800 font-serif flex items-center gap-2 flex-wrap justify-center">
                         <span>Attention(</span>
                         <span class="text-amber-600 font-bold font-sans">Q</span>,
                         <span class="text-sky-600 font-bold font-sans">K</span>,
@@ -209,6 +216,57 @@ const steps = [
                 </div>
             </div>
         `
+    },
+    {
+        title: "7. Coding it in PyTorch (Tutorial)",
+        description: "Let's translate our theory into code using PyTorch! This simple Python snippet shows exactly how LLMs compute Attention.",
+        render: () => `
+            <div class="flex-1 flex flex-col gap-4 step-container h-full">
+                <div class="bg-[#282c34] text-gray-300 p-5 rounded-xl text-sm overflow-x-auto shadow-inner border border-gray-900 font-mono">
+<pre><code><span class="text-keyword">import</span> torch
+<span class="text-keyword">import</span> torch.nn.functional <span class="text-keyword">as</span> F
+
+<span class="text-comment"># 1. Define toy vectors for our words (bank, of, the, river)</span>
+<span class="text-comment"># In reality, these are learned embeddings. Shape: (4 words, dim 3)</span>
+inputs = torch.tensor([
+[1.0, 0.0, 1.0],  <span class="text-comment"># bank</span>
+[0.0, 1.0, 0.0],  <span class="text-comment"># of</span>
+[1.0, 1.0, 0.0],  <span class="text-comment"># the</span>
+[0.0, 0.0, 1.0],  <span class="text-comment"># river</span>
+])
+
+<span class="text-comment"># 2. Assign Queries, Keys, and Values. </span>
+<span class="text-comment"># (In full Transformers, these go through weight matrices first)</span>
+Q = inputs
+K = inputs
+V = inputs
+
+<span class="text-comment"># 3. Calculate Attention Scores: Q multiplied by K-Transposed</span>
+scores = torch.matmul(Q, K.T)
+
+<span class="text-comment"># 4. Scale scores by the square root of the dimension size</span>
+d_k = Q.size(-1)
+scaled_scores = scores / (d_k ** 0.5)
+
+<span class="text-comment"># 5. Apply Softmax to get percentages (attention weights)</span>
+attention_weights = F.softmax(scaled_scores, dim=-1)
+
+<span class="text-comment"># 6. Multiply weights by Values (V) to get the final context vector!</span>
+context = torch.matmul(attention_weights, V)
+
+<span class="text-function">print</span>(<span class="text-string">"Final Context:\\n"</span>, context)</code></pre>
+                </div>
+
+                <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-lg text-sm text-indigo-900 mt-2">
+                    <strong class="text-indigo-700">Code Breakdown:</strong><br>
+                    <ul class="list-disc ml-5 mt-2 space-y-1 text-gray-700">
+                        <li><strong>torch.matmul(Q, K.T):</strong> This is the dot product. It matches the "Query" of each word against the "Key" of every other word simultaneously using matrix math.</li>
+                        <li><strong>F.softmax():</strong> Squeezes all those raw match scores between 0.0 and 1.0, forcing them to sum to 100%.</li>
+                        <li><strong>torch.matmul(weights, V):</strong> Blends the actual meanings (Values) together according to the percentages we just calculated.</li>
+                    </ul>
+                </div>
+            </div>
+        `
     }
 ];
 
@@ -226,7 +284,7 @@ function updateUI() {
 
     // Build Main Content
     let html = `
-        <div class="mb-6">
+        <div class="mb-6 flex-shrink-0">
             <h2 class="text-2xl font-bold text-gray-800 mb-2">${step.title}</h2>
             <p class="text-gray-600 leading-relaxed text-lg">${step.description}</p>
         </div>
@@ -256,8 +314,12 @@ function updateUI() {
         btnNext.classList.replace('hover:bg-indigo-700', 'hover:bg-emerald-700');
     } else {
         btnNext.innerHTML = "Next Step &rarr;";
-        btnNext.classList.replace('bg-emerald-600', 'bg-indigo-600');
-        btnNext.classList.replace('hover:bg-emerald-700', 'hover:bg-indigo-700');
+
+        // Ensure classes exist before replacing just in case user went back from finish
+        if (btnNext.classList.contains('bg-emerald-600')) {
+            btnNext.classList.replace('bg-emerald-600', 'bg-indigo-600');
+            btnNext.classList.replace('hover:bg-emerald-700', 'hover:bg-indigo-700');
+        }
     }
 }
 

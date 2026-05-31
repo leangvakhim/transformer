@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding Attention Mechanism</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- KaTeX CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
+
+    <!-- KaTeX JS -->
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        crossorigin="anonymous"></script>
+
+    <style>
+        /* Smooth transitions for slide content */
+        .slide-enter {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* KaTeX custom sizing for better readability */
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 10px 0;
+            margin: 1em 0;
+        }
+
+        .katex {
+            font-size: 1.15em;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4 md:p-8 font-sans text-slate-800">
+
+    <div class="max-w-4xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col h-full md:h-[800px]">
+
+        <!-- Header -->
+        <header class="bg-indigo-600 text-white p-6 md:p-8 flex-shrink-0">
+            <h1 class="text-2xl md:text-3xl font-bold tracking-tight">How AI "Thinks": The Attention Mechanism</h1>
+            <p class="text-indigo-200 mt-2 text-sm md:text-base">Breaking down linear algebra into intuitive concepts.
+            </p>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="h-2 bg-indigo-100 w-full flex-shrink-0">
+            <div id="progress-bar" class="h-full bg-indigo-500 transition-all duration-300 ease-out" style="width: 0%;">
+            </div>
+        </div>
+
+        <!-- Dynamic Content Area -->
+        <main class="p-6 md:p-10 flex-grow overflow-y-auto flex flex-col justify-start slide-enter" id="content-area">
+            <!-- Content injected by JS -->
+            <h2 id="step-title" class="text-2xl font-bold text-indigo-900 mb-4"></h2>
+            <div id="step-desc" class="text-lg text-slate-600 leading-relaxed space-y-4 mb-8"></div>
+
+            <!-- Visualization Box -->
+            <div id="visual-box" class="mt-auto bg-slate-50 border border-slate-200 rounded-xl p-6 shadow-inner">
+                <!-- Visuals injected by JS -->
+            </div>
+        </main>
+
+        <!-- Footer / Controls -->
+        <footer class="p-6 bg-slate-50 border-t border-slate-200 flex justify-between items-center flex-shrink-0">
+            <button id="btn-back"
+                class="px-6 py-2.5 rounded-lg font-medium text-slate-600 hover:bg-slate-200 hover:text-slate-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m15 18-6-6 6-6" />
+                </svg>
+                Back
+            </button>
+
+            <div class="text-sm font-semibold text-slate-400 tracking-wider uppercase" id="step-counter">
+                Step 1 of X
+            </div>
+
+            <button id="btn-next"
+                class="px-6 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-md shadow-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                Next
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m9 18 6-6-6-6" />
+                </svg>
+            </button>
+        </footer>
+    </div>
+
+    <script src="../js/attention_visualization.js"></script>
+</body>
+
+</html>

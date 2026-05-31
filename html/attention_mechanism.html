@@ -41,16 +41,43 @@
         .math-den {
             padding: 0 0.25rem;
         }
+
+        /* Syntax highlighting basic overrides for dark mode code block */
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        .text-keyword {
+            color: #c678dd;
+        }
+
+        /* Purple */
+        .text-function {
+            color: #61afef;
+        }
+
+        /* Blue */
+        .text-comment {
+            color: #7f848e;
+            font-style: italic;
+        }
+
+        /* Gray */
+        .text-string {
+            color: #98c379;
+        }
+
+        /* Green */
     </style>
 </head>
 
 <body class="bg-gray-50 min-h-screen flex items-center justify-center p-4 font-sans text-gray-800">
 
     <div
-        class="bg-white rounded-2xl shadow-xl border border-gray-100 w-full max-w-4xl overflow-hidden flex flex-col min-h-[600px]">
+        class="bg-white rounded-2xl shadow-xl border border-gray-100 w-full max-w-4xl overflow-hidden flex flex-col min-h-[650px]">
 
         <!-- Header -->
-        <div class="bg-white border-b border-gray-100 px-8 py-6">
+        <div class="bg-white border-b border-gray-100 px-8 py-6 z-10">
             <h1 class="text-3xl font-bold text-gray-900 tracking-tight">The Attention Mechanism</h1>
             <p class="text-gray-500 mt-1">How AI understands the context of words</p>
 
@@ -63,18 +90,18 @@
         </div>
 
         <!-- Content Area -->
-        <div class="flex-1 px-8 py-8 flex flex-col" id="content-area">
+        <div class="flex-1 px-8 py-8 flex flex-col overflow-y-auto" id="content-area">
             <!-- Dynamic content injected by JS -->
         </div>
 
         <!-- Footer / Controls -->
-        <div class="bg-gray-50 px-8 py-5 border-t border-gray-200 flex justify-between items-center">
+        <div class="bg-gray-50 px-8 py-5 border-t border-gray-200 flex justify-between items-center z-10">
             <button id="btn-prev"
                 class="px-6 py-2.5 rounded-lg font-medium text-gray-600 bg-white border border-gray-300 hover:bg-gray-50 hover:text-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 &larr; Back
             </button>
             <div id="step-counter" class="text-sm font-medium text-gray-500">
-                Step 1 of 6
+                Step 1 of 7
             </div>
             <button id="btn-next"
                 class="px-6 py-2.5 rounded-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
