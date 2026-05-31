@@ -1,9 +1,11 @@
-// Define the steps data
+// <!-- Embedded Application Logic -->
+// Define the steps data with the new 'actionLink' property for desired steps
 const stepsData = [
     {
         id: 1,
         title: "The Foundation: Foundation Models",
         desc: "Before 'Applied Engineering', there's the Base LLM. It's trained on massive amounts of text using next-token prediction. It knows language, but doesn't know how to follow specific instructions yet.",
+        actionLink: { url: "./llm_foundation_model.html", text: "View Foundation Models Details" },
         visual: `
             <div class="flex items-center space-x-6">
                 <div class="w-32 h-32 rounded-lg bg-slate-100 border-2 border-slate-300 border-dashed flex items-center justify-center flex-col text-slate-400">
@@ -23,6 +25,7 @@ const stepsData = [
         id: 2,
         title: "Prompt Engineering & In-Context Learning",
         desc: "The simplest form of Applied LLM Engineering. Instead of retraining the model, we craft detailed instructions and provide examples in the prompt to guide its behavior at runtime.",
+        actionLink: { url: "./prompt_engineering.html", text: "View Prompt Engineering Details" },
         visual: `
             <div class="flex flex-col space-y-4 w-full max-w-md animate-fade-in">
                 <div class="bg-brand-50 p-4 rounded-lg border border-brand-200 shadow-sm relative">
@@ -45,6 +48,7 @@ const stepsData = [
         id: 3,
         title: "RAG (Retrieval-Augmented Generation)",
         desc: "LLMs hallucinate and don't know your private data. RAG fixes this by searching a database for facts *before* generating an answer, giving the LLM an 'open-book' exam.",
+        actionLink: { url: "./rag.html", text: "RAG (Retrieval-Augmented Generation) Details" },
         visual: `
             <div class="flex flex-col items-center space-y-6 w-full animate-fade-in">
                 <div class="flex items-center justify-center space-x-4 w-full">
@@ -87,6 +91,7 @@ const stepsData = [
         id: 4,
         title: "Fine-Tuning & PEFT (LoRA)",
         desc: "When prompt engineering isn't enough to capture a specific tone or complex task, we fine-tune. Instead of retraining the whole massive model, Parameter-Efficient Fine-Tuning (PEFT/LoRA) adds tiny, trainable 'adapter' layers.",
+        actionLink: { url: "./fine_tuning_peft.html", text: "View Fine-Tuning and PERF/LoRA Details" },
         visual: `
             <div class="flex items-center justify-center space-x-8 animate-fade-in">
                 <!-- Full Model -->
@@ -121,6 +126,7 @@ const stepsData = [
         id: 5,
         title: "The Core Equation: Scaled Dot-Product Attention",
         desc: "At the heart of every Transformer LLM is the Attention Mechanism. It allows the model to look at the surrounding words to derive the true meaning and context of a specific word.",
+        // NO actionLink HERE as requested (exclude step 5 of 6)
         visual: `
             <div class="w-full flex flex-col items-center animate-fade-in">
                 <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 w-full text-center">
@@ -153,6 +159,7 @@ const stepsData = [
         id: 6,
         title: "Optimization & Deployment",
         desc: "Taking the model from research to production requires serving it efficiently. We use techniques to shrink the model size and speed up inference times so it runs fast and cheap.",
+        actionLink: { url: "./optimization_deployment.html", text: "View Optimization & Deployment" },
         visual: `
             <div class="flex flex-col items-center space-y-6 w-full animate-fade-in">
 
@@ -213,6 +220,7 @@ let currentStepIndex = 0;
 const titleEl = document.getElementById('step-title');
 const descEl = document.getElementById('step-desc');
 const visualEl = document.getElementById('step-visual');
+const actionEl = document.getElementById('step-action');
 const badgeEl = document.getElementById('step-badge');
 const counterEl = document.getElementById('step-counter');
 const btnNext = document.getElementById('btn-next');
@@ -245,6 +253,20 @@ function renderStep() {
 
     visualEl.innerHTML = step.visual;
 
+    // Render action button if 'actionLink' exists
+    if (step.actionLink) {
+        actionEl.innerHTML = `
+            <a href="${step.actionLink.url}" class="group flex items-center space-x-2 px-5 py-2.5 bg-white border-2 border-slate-200 text-slate-700 font-semibold text-sm rounded-full hover:border-brand-500 hover:text-brand-600 transition-all shadow-sm animate-fade-in">
+                <span>${step.actionLink.text}</span>
+                <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-70 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></i>
+            </a>
+        `;
+        actionEl.style.display = 'flex';
+    } else {
+        actionEl.innerHTML = '';
+        actionEl.style.display = 'none';
+    }
+
     // Re-render Math if present (KaTeX)
     if (visualEl.querySelector('.math-render')) {
         renderMathInElement(visualEl, {
@@ -271,8 +293,10 @@ function renderStep() {
     } else {
         btnNext.disabled = false;
         btnNext.innerHTML = `<span>Next Step</span> <i class="fa-solid fa-arrow-right"></i>`;
-        btnNext.classList.replace('bg-emerald-600', 'bg-brand-600');
-        btnNext.classList.replace('hover:bg-emerald-700', 'hover:bg-brand-700');
+        if (btnNext.classList.contains('bg-emerald-600')) {
+            btnNext.classList.replace('bg-emerald-600', 'bg-brand-600');
+            btnNext.classList.replace('hover:bg-emerald-700', 'hover:bg-brand-700');
+        }
     }
 }
 
