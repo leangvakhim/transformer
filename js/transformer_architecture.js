@@ -1,3 +1,4 @@
+// <!-- JavaScript integrated within the file -->
 // Data structure defining each step of the explanation
 const steps = [
     {
@@ -22,7 +23,7 @@ const steps = [
     },
     {
         title: "2. Embeddings & Position",
-        text: "<p>Computers don't understand words; they understand numbers.</p><p>First, text is split into chunks called <strong>Tokens</strong>. Then, each token is converted into a list of numbers called an <strong>Embedding</strong>.</p><p>Because Transformers process everything simultaneously, they lose track of word order. We fix this by adding <strong>Positional Encoding</strong>—a mathematical timestamp so the AI knows which word came first.</p>",
+        text: "<p>Computers don't understand words; they understand numbers.</p><p>First, text is split into chunks called <strong>Tokens</strong>. Then, each token is converted into a list of numbers called an <strong>Embedding</strong>.</p><p>Because Transformers process everything simultaneously, they lose track of word order. We fix this by adding <strong>Positional Encoding</strong>, a mathematical timestamp so the AI knows which word came first.</p>",
         visual: `
             <div class="flex flex-col items-center space-y-4 w-full fade-in">
                 <div class="flex space-x-4">
@@ -102,7 +103,7 @@ const steps = [
                     <div class="text-gray-400">&darr;</div>
                     <div class="bg-yellow-100 border border-yellow-300 px-4 py-2 rounded-full w-3/4 text-center text-yellow-800 text-xs z-10 shadow-sm">Add & Norm</div>
 
-                    <!-- Residual Lines (Decorative via absolute positioning) -->
+                    <!-- Residual Lines -->
                     <div class="absolute left-[-20px] top-[15px] bottom-[200px] w-[30px] border-l-2 border-t-2 border-b-2 border-gray-300 rounded-l-xl"></div>
                     <div class="absolute right-[-20px] top-[180px] bottom-[20px] w-[30px] border-r-2 border-t-2 border-b-2 border-gray-300 rounded-r-xl"></div>
                 </div>
@@ -162,6 +163,54 @@ const steps = [
 
             </div>
         `
+    },
+    {
+        title: "7. PyTorch Tutorial",
+        text: "<p>Let's build the <strong>Self-Attention Mechanism</strong> in Python using PyTorch!</p><ul class='list-disc pl-5 space-y-2 mt-2'><li class='text-sm'><strong>Step 1:</strong> We define mock input embeddings (x) for 3 words.</li><li class='text-sm'><strong>Step 2 & 3:</strong> We multiply the input by learned weight matrices to get Queries (Q), Keys (K), and Values (V).</li><li class='text-sm'><strong>Step 4 & 5:</strong> We calculate Attention Scores using the dot product of Q and K, then apply Softmax to get percentages.</li><li class='text-sm'><strong>Step 6:</strong> Finally, we multiply these probabilities by V to get context-aware words!</li></ul>",
+        visual: `
+            <div class="w-full fade-in h-full flex flex-col rounded-xl overflow-hidden shadow-lg border border-gray-700 bg-gray-900 code-scroll" style="max-height: 450px; overflow-y: auto;">
+                <div class="bg-gray-800 px-4 py-2 border-b border-gray-700 flex items-center space-x-2">
+                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                    <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                    <span class="text-xs text-gray-400 ml-2 font-mono">transformer_tutorial.py</span>
+                </div>
+                <pre class="p-4 text-sm font-mono text-gray-300 leading-relaxed overflow-x-auto"><code class="language-python"><span class="text-purple-400">import</span> torch
+<span class="text-purple-400">import</span> torch.nn.functional <span class="text-purple-400">as</span> F
+<span class="text-purple-400">import</span> math
+
+<span class="text-green-400"># 1. Simulate input embeddings (3 words: "The", "quick", "fox")</span>
+x = torch.tensor([
+[1.0, 0.1, -0.5, 0.2],  <span class="text-green-400"># "The"</span>
+[-0.2, 1.2, 0.8, -0.1], <span class="text-green-400"># "quick"</span>
+[0.5, -0.4, 0.1, 0.9]   <span class="text-green-400"># "fox"</span>
+])
+
+<span class="text-green-400"># 2. Setup Weight Matrices (In real models, these are learned parameters)</span>
+W_q = torch.randn(4, 4)
+W_k = torch.randn(4, 4)
+W_v = torch.randn(4, 4)
+
+<span class="text-green-400"># 3. Create Query, Key, and Value vectors</span>
+Q = x @ W_q
+K = x @ W_k
+V = x @ W_v
+
+<span class="text-green-400"># 4. Calculate Attention Scores (Q * K^T)</span>
+scores = Q @ K.transpose(0, 1)
+
+<span class="text-green-400"># 5. Scale scores and apply Softmax to get probabilities</span>
+d_k = K.shape[-1]
+scaled_scores = scores / math.sqrt(d_k)
+attention_weights = F.softmax(scaled_scores, dim=-1)
+
+<span class="text-green-400"># 6. Get Final Output by multiplying weights with Values</span>
+output = attention_weights @ V
+
+<span class="text-blue-300">print</span>(<span class="text-yellow-300">"Final Context-Aware Vectors:\\n"</span>, output)
+</code></pre>
+            </div>
+        `
     }
 ];
 
@@ -175,6 +224,7 @@ const badgeEl = document.getElementById('step-badge');
 const btnPrev = document.getElementById('btn-prev');
 const btnNext = document.getElementById('btn-next');
 const progressDots = document.getElementById('progress-dots');
+const extraResourcesEl = document.getElementById('extra-resources');
 
 // Initialize UI
 function init() {
@@ -218,10 +268,42 @@ function updateView() {
         descEl.innerHTML = stepData.text;
         visualEl.innerHTML = stepData.visual;
 
-        // Tell MathJax to re-render the equations if they exist in the new HTML
-        if (window.MathJax) {
-            MathJax.typesetPromise([visualEl]).catch(function (err) {
-                console.error('MathJax rendering error:', err.message);
+        // Control visibility of the 3 external HTML buttons
+        // Only show on original Step 4, 5, 6 (which corresponds to array indices 3, 4, 5)
+        if (currentStep >= 3 && currentStep <= 5) {
+            extraResourcesEl.classList.remove('hidden');
+
+            const btn1 = document.getElementById('res-btn-1');
+            const btn2 = document.getElementById('res-btn-2');
+            const btn3 = document.getElementById('res-btn-3');
+
+            // Hide all buttons initially
+            btn1.classList.remove('flex'); btn1.classList.add('hidden');
+            btn2.classList.remove('flex'); btn2.classList.add('hidden');
+            btn3.classList.remove('flex'); btn3.classList.add('hidden');
+
+            // Show only the specific button corresponding to the step
+            if (currentStep === 3) {
+                btn1.classList.remove('hidden'); btn1.classList.add('flex');
+            } else if (currentStep === 4) {
+                btn2.classList.remove('hidden'); btn2.classList.add('flex');
+            } else if (currentStep === 5) {
+                btn3.classList.remove('hidden'); btn3.classList.add('flex');
+            }
+        } else {
+            extraResourcesEl.classList.add('hidden');
+        }
+
+        // Tell KaTeX to re-render the equations if they exist in the new HTML
+        if (window.renderMathInElement) {
+            renderMathInElement(visualEl, {
+                delimiters: [
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                    { left: '\\(', right: '\\)', display: false },
+                    { left: '\\[', right: '\\]', display: true }
+                ],
+                throwOnError: false
             });
         }
     }, 50);
