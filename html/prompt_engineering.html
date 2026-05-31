@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Engineering & In-Context Learning Explained</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- KaTeX for math formulas (Removed defer and updated to reliable CDN without integrity locks to ensure it loads before DOMContentLoaded) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Roboto+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f0fdfa;
+            /* Light teal background */
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .code-font {
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        /* Slide Transition Animations */
+        .slide {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            transform: translateY(20px);
+        }
+
+        .slide.active {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Robot Animations */
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .floating-robot {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            96%,
+            98% {
+                transform: scaleY(1);
+            }
+
+            97% {
+                transform: scaleY(0.1);
+            }
+        }
+
+        .robot-eye {
+            transform-origin: center;
+            animation: blink 4s infinite;
+        }
+
+        /* Chat bubble styles */
+        .chat-bubble {
+            position: relative;
+            background: white;
+            border-radius: .4em;
+            padding: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        .chat-bubble:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 0;
+            height: 0;
+            border: 15px solid transparent;
+            border-right-color: white;
+            border-left: 0;
+            border-bottom: 0;
+            margin-top: -7.5px;
+            margin-left: -15px;
+        }
+
+        .chat-bubble.right-arrow:after {
+            left: auto;
+            right: 0;
+            border-right-color: transparent;
+            border-left-color: white;
+            border-left: 15px solid white;
+            margin-left: auto;
+            margin-right: -15px;
+        }
+
+        /* Formula Container */
+        .math-container {
+            background-color: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+        }
+
+        /* Button hover effects */
+        .btn-nav {
+            transition: all 0.2s ease;
+        }
+
+        .btn-nav:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .btn-nav:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-teal-600 text-white p-4 shadow-md sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold flex items-center gap-2">
+                <i class="fa-solid fa-robot"></i> The Game of Pretend
+            </h1>
+            <div class="text-sm bg-teal-800 px-3 py-1 rounded-full code-font">
+                Prompt Engineering & In-Context Learning
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow flex flex-col items-center justify-center p-4 sm:p-8 w-full max-w-5xl mx-auto">
+
+        <!-- Presentation Container -->
+        <div
+            class="bg-white rounded-2xl shadow-xl w-full flex flex-col min-h-[600px] overflow-hidden border border-gray-100 relative">
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-gray-200 h-2">
+                <div id="progress-bar" class="bg-teal-500 h-2 transition-all duration-300" style="width: 0%"></div>
+            </div>
+
+            <!-- Slides Container -->
+            <div id="slides-container" class="flex-grow p-6 sm:p-10 flex flex-col justify-center relative">
+
+                <!-- Slide 1: Introduction -->
+                <div class="slide active flex-col items-center text-center gap-6" id="slide-1">
+                    <h2 class="text-4xl font-extrabold text-teal-700 mb-2">Meet Your Super-Smart Robot Friend!</h2>
+
+                    <div class="w-48 h-48 relative floating-robot my-4">
+                        <!-- SVG Robot -->
+                        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Antenna -->
+                            <line x1="100" y1="20" x2="100" y2="50" stroke="#475569" stroke-width="4" />
+                            <circle cx="100" cy="15" r="8" fill="#ef4444" />
+                            <!-- Head -->
+                            <rect x="50" y="50" width="100" height="80" rx="15" fill="#cbd5e1" stroke="#94a3b8"
+                                stroke-width="4" />
+                            <!-- Eyes -->
+                            <circle class="robot-eye" cx="75" cy="80" r="10" fill="#3b82f6" />
+                            <circle class="robot-eye" cx="125" cy="80" r="10" fill="#3b82f6" />
+                            <!-- Mouth -->
+                            <rect x="70" y="105" width="60" height="10" rx="5" fill="#475569" />
+                            <!-- Body -->
+                            <rect x="60" y="140" width="80" height="60" rx="10" fill="#94a3b8" />
+                            <!-- Neck -->
+                            <rect x="90" y="130" width="20" height="10" fill="#64748b" />
+                        </svg>
+                    </div>
+
+                    <p class="text-xl text-gray-700 max-w-2xl leading-relaxed">
+                        Imagine this robot has read almost every book in the world. It knows a lot!
+                        But there's a catch: <br><br>
+                        <span class="font-bold text-rose-600 bg-rose-50 px-2 py-1 rounded">It doesn't automatically know
+                            how you want it to act unless you tell it.</span>
+                    </p>
+                </div>
+
+                <!-- Slide 2: The Analogy -->
+                <div class="slide flex-col items-center text-center gap-6" id="slide-2">
+                    <h2 class="text-3xl font-bold text-teal-700">What is Prompt Engineering?</h2>
+
+                    <div class="flex flex-col md:flex-row gap-8 items-center w-full mt-4">
+                        <div class="flex-1 bg-red-50 p-6 rounded-xl border border-red-200">
+                            <i class="fa-solid fa-screwdriver-wrench text-4xl text-red-400 mb-4"></i>
+                            <h3 class="text-xl font-bold text-red-700 mb-2">The Old Way</h3>
+                            <p class="text-gray-700">Opening up the robot's brain with a screwdriver to change how it
+                                works (reprogramming/fine-tuning).</p>
+                        </div>
+
+                        <div class="text-4xl text-gray-300 font-bold hidden md:block">VS</div>
+
+                        <div
+                            class="flex-1 bg-green-50 p-6 rounded-xl border border-green-200 shadow-md transform scale-105">
+                            <i class="fa-solid fa-comments text-4xl text-green-500 mb-4"></i>
+                            <h3 class="text-xl font-bold text-green-700 mb-2">Prompt Engineering</h3>
+                            <p class="text-gray-700">Using our <strong>words</strong> to set the rules of the game.
+                                Giving the robot the best possible instructions!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 3: Step 1 - System Prompt -->
+                <div class="slide flex-col justify-center h-full gap-4" id="slide-3">
+                    <div
+                        class="inline-block bg-blue-100 text-blue-800 px-4 py-1 rounded-full font-bold text-sm mb-2 self-start uppercase tracking-wider">
+                        Step 1 of 3</div>
+                    <h2 class="text-3xl font-bold text-slate-800">1. System <span
+                            class="text-xl font-normal text-gray-500">(The Main Rule)</span></h2>
+
+                    <p class="text-lg text-gray-700 mb-4">This is where you tell the robot <strong>who it is supposed to
+                            be</strong>.</p>
+
+                    <div class="flex flex-col md:flex-row gap-6 items-stretch w-full">
+                        <!-- Kid Example -->
+                        <div class="flex-1 bg-amber-50 p-5 rounded-xl border border-amber-200">
+                            <h3 class="font-bold text-amber-800 mb-3 flex items-center gap-2"><i
+                                    class="fa-solid fa-child"></i> The "Game of Pretend"</h3>
+                            <div
+                                class="bg-white p-4 rounded-lg shadow-sm font-medium text-amber-900 border-l-4 border-amber-500">
+                                "You are a grumpy pirate captain who loves treasure."
+                            </div>
+                            <div class="mt-4 flex justify-center">
+                                <i class="fa-solid fa-skull-crossbones text-4xl text-amber-300"></i>
+                            </div>
+                        </div>
+
+                        <!-- Real World Example -->
+                        <div class="flex-1 bg-slate-50 p-5 rounded-xl border border-slate-200">
+                            <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2"><i
+                                    class="fa-solid fa-laptop-code"></i> The Tech Reality</h3>
+                            <div
+                                class="bg-white p-4 rounded-lg shadow-sm font-medium text-slate-900 border-l-4 border-slate-500 code-font text-sm">
+                                {"role": "system", "content": "You are an expert code reviewer."}
+                            </div>
+                            <div class="mt-4 flex justify-center">
+                                <i class="fa-solid fa-code text-4xl text-slate-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 4: Step 2 - Context (In-Context Learning) -->
+                <div class="slide flex-col justify-center h-full gap-4" id="slide-4">
+                    <div
+                        class="inline-block bg-blue-100 text-blue-800 px-4 py-1 rounded-full font-bold text-sm mb-2 self-start uppercase tracking-wider">
+                        Step 2 of 3</div>
+                    <h2 class="text-3xl font-bold text-slate-800">2. Context <span
+                            class="text-xl font-normal text-gray-500">(The Practice Round)</span></h2>
+
+                    <p class="text-lg text-gray-700">Sometimes, telling isn't enough. We need to <strong>show</strong>
+                        them how to play. This is called <strong>In-Context Learning (Few-Shot)</strong>.</p>
+
+                    <div class="bg-white border-2 border-indigo-100 rounded-xl p-4 shadow-inner mt-2">
+                        <h4 class="font-bold text-indigo-800 mb-4 border-b pb-2">Pirate Practice Round:</h4>
+
+                        <div class="flex flex-col gap-3">
+                            <div class="flex items-start gap-4">
+                                <div
+                                    class="bg-gray-200 w-10 h-10 rounded-full flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-user text-gray-500"></i></div>
+                                <div class="bg-gray-100 p-3 rounded-lg rounded-tl-none w-full shadow-sm text-gray-800">
+                                    If I say 'Hello'...
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-4 flex-row-reverse">
+                                <div
+                                    class="bg-amber-200 w-10 h-10 rounded-full flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-robot text-amber-700"></i></div>
+                                <div
+                                    class="bg-amber-100 p-3 rounded-lg rounded-tr-none shadow-sm text-amber-900 font-bold w-full text-right">
+                                    ...you say 'Arrrgh, go away!'
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-4 mt-2">
+                                <div
+                                    class="bg-gray-200 w-10 h-10 rounded-full flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-user text-gray-500"></i></div>
+                                <div class="bg-gray-100 p-3 rounded-lg rounded-tl-none w-full shadow-sm text-gray-800">
+                                    If I say 'Look, a shiny coin!'...
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-4 flex-row-reverse">
+                                <div
+                                    class="bg-amber-200 w-10 h-10 rounded-full flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-robot text-amber-700"></i></div>
+                                <div
+                                    class="bg-amber-100 p-3 rounded-lg rounded-tr-none shadow-sm text-amber-900 font-bold w-full text-right">
+                                    ...you say 'Mine! Give me the loot!'
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-500 text-center italic mt-2">The robot learns the pattern right then and
+                        there!</p>
+                </div>
+
+                <!-- Slide 5: The Math behind it (Optional deep dive) -->
+                <div class="slide flex-col justify-center h-full gap-4" id="slide-5">
+                    <div
+                        class="inline-block bg-purple-100 text-purple-800 px-4 py-1 rounded-full font-bold text-sm mb-2 self-start uppercase tracking-wider">
+                        Geek Out Moment</div>
+                    <h2 class="text-3xl font-bold text-slate-800">How does the Robot "Learn" in Context?</h2>
+
+                    <p class="text-lg text-gray-700">
+                        Under the hood, Large Language Models (LLMs) are just predicting the next word (token).
+                        By providing examples, you change the <strong>conditional probability</strong> of the next word.
+                    </p>
+
+                    <div class="math-container shadow-inner">
+                        <p class="text-sm text-gray-600 mb-2 font-bold">Standard generation (No context):</p>
+                        <div id="math-eq-1" class="text-center text-lg mb-4"></div>
+
+                        <p class="text-sm text-gray-600 mb-2 font-bold">Few-Shot In-Context Learning:</p>
+                        <div id="math-eq-2" class="text-center text-lg"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mt-2">
+                        <div class="bg-white p-3 rounded border border-gray-200 shadow-sm">
+                            <span class="font-bold font-mono">P(w<sub>t</sub> | ...)</span> : Probability of next word
+                        </div>
+                        <div class="bg-white p-3 rounded border border-gray-200 shadow-sm">
+                            <span class="font-bold font-mono">S</span> : System Prompt ("You are a pirate")
+                        </div>
+                        <div class="bg-white p-3 rounded border border-gray-200 shadow-sm">
+                            <span class="font-bold font-mono">(x<sub>i</sub>, y<sub>i</sub>)</span> : Examples ("Hello",
+                            "Argh!")
+                        </div>
+                        <div class="bg-white p-3 rounded border border-gray-200 shadow-sm">
+                            <span class="font-bold font-mono">x<sub>new</sub></span> : Your new prompt
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 6: Step 3 - User Prompt -->
+                <div class="slide flex-col justify-center h-full gap-4" id="slide-6">
+                    <div
+                        class="inline-block bg-blue-100 text-blue-800 px-4 py-1 rounded-full font-bold text-sm mb-2 self-start uppercase tracking-wider">
+                        Step 3 of 3</div>
+                    <h2 class="text-3xl font-bold text-slate-800">3. User <span
+                            class="text-xl font-normal text-gray-500">(Your Turn!)</span></h2>
+
+                    <p class="text-lg text-gray-700 mb-6">This is where you finally ask the robot your real question or
+                        give it a task.</p>
+
+                    <div class="bg-sky-50 rounded-2xl p-6 border-2 border-sky-200 relative overflow-visible mt-4">
+
+                        <!-- User Input -->
+                        <div class="flex gap-4 items-end mb-8 relative z-10">
+                            <div
+                                class="bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-lg border-2 border-white">
+                                <i class="fa-solid fa-child-reaching text-xl"></i>
+                            </div>
+                            <div
+                                class="bg-white p-4 rounded-2xl rounded-bl-none shadow-md border border-gray-100 text-lg font-medium">
+                                "Look at this cute puppy!"
+                            </div>
+                        </div>
+
+                        <!-- Processing indicator -->
+                        <div class="text-center my-4 text-gray-400">
+                            <i class="fa-solid fa-arrow-down fa-bounce text-2xl"></i>
+                            <p class="text-xs uppercase tracking-widest mt-1">Robot thinking based on rules &
+                                examples...</p>
+                        </div>
+
+                        <!-- Robot Output -->
+                        <div class="flex gap-4 items-end flex-row-reverse relative z-10">
+                            <div
+                                class="bg-amber-500 text-white w-14 h-14 rounded-full flex items-center justify-center shrink-0 shadow-lg border-2 border-white">
+                                <i class="fa-solid fa-robot text-2xl"></i>
+                                <!-- Pirate hat overlay -->
+                                <i class="fa-solid fa-hat-cowboy text-gray-900 absolute -top-3 transform rotate-12"
+                                    style="font-size: 1.5rem;"></i>
+                            </div>
+                            <div
+                                class="bg-amber-100 p-5 rounded-2xl rounded-br-none shadow-md border-2 border-amber-300 text-xl font-bold text-amber-900 font-serif italic">
+                                "Arrrgh, keep that furry beast away from me ship's wheel!"
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Slide 7: Why is this cool? -->
+                <div class="slide flex-col items-center justify-center h-full gap-6 text-center" id="slide-7">
+                    <h2 class="text-4xl font-extrabold text-teal-700 mb-4">Why is this so cool?</h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl">
+                        <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-green-500">
+                            <i class="fa-solid fa-recycle text-4xl text-green-500 mb-4"></i>
+                            <h3 class="text-xl font-bold mb-2">No New Robot Needed</h3>
+                            <p class="text-gray-600">You didn't build a new Pirate Robot. You used the same general
+                                robot, but gave it a specific game to play.</p>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-500">
+                            <i class="fa-solid fa-bolt text-4xl text-blue-500 mb-4"></i>
+                            <h3 class="text-xl font-bold mb-2">Instant Switching</h3>
+                            <p class="text-gray-600">Want to play "Astronaut" instead? Just change the System prompt and
+                                Examples. It switches immediately!</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 p-6 bg-teal-50 rounded-xl border border-teal-200 w-full max-w-3xl shadow-sm">
+                        <h3 class="text-lg font-bold text-teal-900 mb-2">Your turn to think:</h3>
+                        <p class="text-teal-800 text-xl italic">
+                            "What kind of character or job would you want to instruct a robot to pretend to be to test
+                            this out?"
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Navigation Footer -->
+            <div class="bg-gray-50 p-4 border-t border-gray-200 flex justify-between items-center z-10">
+                <button id="btn-prev"
+                    class="btn-nav px-6 py-2.5 bg-white border border-gray-300 text-gray-700 font-semibold rounded-lg shadow-sm hover:bg-gray-50 flex items-center gap-2"
+                    disabled>
+                    <i class="fa-solid fa-arrow-left"></i> Back
+                </button>
+
+                <div class="text-gray-500 font-medium">
+                    Step <span id="current-step" class="text-teal-600 font-bold">1</span> of <span
+                        id="total-steps">7</span>
+                </div>
+
+                <button id="btn-next"
+                    class="btn-nav px-6 py-2.5 bg-teal-600 text-white font-semibold rounded-lg shadow-md hover:bg-teal-700 flex items-center gap-2">
+                    Next <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="../js/prompt_engineering.js"></script>
+</body>
+
+</html>

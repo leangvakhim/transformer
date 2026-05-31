@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Optimization: Quantization & Batching</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- KaTeX CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <!-- KaTeX Auto-render extension to easily parse math within text -->
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        /* Custom animations for the visual elements */
+        .fade-enter {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+        }
+
+        .fade-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .bus-drive {
+            animation: drive 3s infinite linear;
+        }
+
+        @keyframes drive {
+            0% {
+                transform: translateX(-50px);
+                opacity: 0;
+            }
+
+            20% {
+                opacity: 1;
+            }
+
+            80% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateX(150px);
+                opacity: 0;
+            }
+        }
+
+        .bounce-slow {
+            animation: bounce 2s infinite;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 min-h-screen font-sans flex items-center justify-center p-4">
+
+    <!-- Main Application Container -->
+    <div class="max-w-4xl w-full bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col min-h-[600px]">
+
+        <!-- Header & Progress Bar -->
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white text-center relative">
+            <h1 class="text-2xl font-bold">Making AI Faster & Smaller 🤖⚡</h1>
+            <p class="text-blue-100 text-sm mt-1">Understanding Quantization & The Inference Engine</p>
+
+            <!-- Progress indicators -->
+            <div class="flex justify-center mt-6 space-x-2" id="progress-dots">
+                <!-- Dots will be injected via JS -->
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex-grow p-8 flex flex-col justify-center" id="content-area">
+
+            <div id="step-container" class="fade-enter">
+                <h2 id="step-title" class="text-3xl font-extrabold text-gray-800 mb-6 text-center">Title</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+
+                    <!-- Text Description Column -->
+                    <div id="step-description" class="text-gray-600 space-y-4">
+                        <!-- Description injected via JS -->
+                    </div>
+
+                    <!-- Visual/Formula Column -->
+                    <div
+                        class="bg-slate-100 rounded-xl p-6 border border-slate-200 shadow-inner flex flex-col items-center justify-center min-h-[250px]">
+                        <div id="step-visual" class="w-full text-center">
+                            <!-- Visuals/Emojis injected via JS -->
+                        </div>
+                        <div id="step-formula-container"
+                            class="hidden mt-6 bg-white p-4 rounded-lg shadow-sm w-full overflow-x-auto text-center border border-slate-200 text-xl">
+                            <!-- KaTeX formula injected here -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer / Navigation -->
+        <div class="bg-slate-100 p-6 border-t border-slate-200 flex justify-between items-center">
+            <button id="btn-back"
+                class="px-6 py-3 bg-white text-slate-700 font-semibold rounded-lg shadow border border-slate-300 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back
+            </button>
+            <span id="step-counter" class="text-slate-500 font-medium">Step 1 of X</span>
+            <button id="btn-next"
+                class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center">
+                Next
+                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </button>
+        </div>
+
+    </div>
+
+    <script src="../js/optimization_deployment.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoRA & Fine-Tuning Visualization</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- KaTeX for LaTeX Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+    <style>
+        /* Custom Animations */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px) rotate(-5deg);
+            }
+
+            75% {
+                transform: translateX(5px) rotate(5deg);
+            }
+        }
+
+        @keyframes glow {
+
+            0%,
+            100% {
+                filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.4));
+            }
+
+            50% {
+                filter: drop-shadow(0 0 35px rgba(59, 130, 246, 0.8));
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .animate-shake {
+            animation: shake 0.5s ease-in-out infinite;
+        }
+
+        .animate-glow {
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        .fade-transition {
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .step-enter {
+            animation: slideInRight 0.5s forwards;
+        }
+
+        /* Hide scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f8fafc;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 min-h-screen flex items-center justify-center p-4 font-sans">
+
+    <!-- Main Container -->
+    <div
+        class="max-w-6xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col lg:flex-row min-h-[650px] border border-slate-200">
+
+        <!-- Left Panel: Visualizations -->
+        <div class="lg:w-1/2 bg-slate-50 relative flex items-center justify-center p-8 overflow-hidden min-h-[300px] lg:min-h-full border-b lg:border-b-0 lg:border-r border-slate-200"
+            id="visualContainer">
+            <!-- Visual elements will be injected here via JS -->
+        </div>
+
+        <!-- Right Panel: Content & Controls -->
+        <div
+            class="lg:w-1/2 p-8 md:p-12 flex flex-col justify-between relative bg-gradient-to-br from-white to-slate-50">
+
+            <!-- Step Content -->
+            <div id="contentArea" class="flex-grow flex flex-col justify-center">
+                <span id="stepBadge"
+                    class="inline-block px-3 py-1 bg-blue-100 text-blue-600 font-semibold rounded-full text-sm w-max mb-4">
+                    Introduction
+                </span>
+                <h2 id="stepTitle" class="text-3xl md:text-4xl font-extrabold mb-6 text-slate-900 leading-tight"></h2>
+                <div id="stepDescription" class="text-lg text-slate-600 leading-relaxed space-y-4"></div>
+
+                <!-- Math Formula Area (Hidden by default) -->
+                <div id="mathArea"
+                    class="mt-8 bg-slate-100 p-6 rounded-2xl shadow-inner border border-slate-200 hidden text-center text-lg md:text-xl text-blue-700 overflow-x-auto">
+                    <!-- KaTeX will render here -->
+                </div>
+            </div>
+
+            <!-- Navigation Controls -->
+            <div class="mt-10 flex justify-between items-center border-t border-slate-200 pt-6">
+                <button id="prevBtn"
+                    class="px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
+                        </path>
+                    </svg>
+                    Back
+                </button>
+
+                <!-- Progress Dots -->
+                <div id="progressDots" class="flex gap-2">
+                    <!-- Dots injected via JS -->
+                </div>
+
+                <button id="nextBtn"
+                    class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-lg shadow-blue-600/20 flex items-center gap-2">
+                    Next
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA & CONTENT ---
+        const tutorialSteps = [
+            {
+                badge: "Step 1",
+                title: "The Giant Robot (The Base Model) 🤖",
+                description: `
+                    <p>Imagine you have a giant, super-smart robot. This robot has read almost every book in the world and knows a little bit about everything.</p>
+                    <p>This giant robot is what we call the <strong>Base Model</strong> (like GPT-3 or Llama). It is amazing, but right now, it speaks just like a normal person.</p>
+                    <p>What if you want it to tell jokes exactly like a circus clown? 🤡</p>
+                `,
+                math: null,
+                visual: `
+                    <div class="relative flex items-center justify-center w-full h-full">
+                        <div class="text-[120px] md:text-[180px] animate-float z-10 filter drop-shadow-2xl">🤖</div>
+                        <!-- Floating Books -->
+                        <div class="absolute top-10 left-10 text-4xl animate-float" style="animation-delay: 0.5s;">📚</div>
+                        <div class="absolute bottom-20 right-10 text-5xl animate-float" style="animation-delay: 1.2s;">📖</div>
+                        <div class="absolute top-20 right-20 text-3xl animate-float" style="animation-delay: 0.8s;">🧠</div>
+                    </div>
+                `
+            },
+            {
+                badge: "Step 2",
+                title: "Full Fine-Tuning 🏭",
+                description: `
+                    <p>Teaching the robot this specific new clown skill is called <strong>Fine-Tuning</strong>.</p>
+                    <p>The old way to do this was really hard! You would have to take the robot's giant brain completely apart, add the clown jokes, and put it all back together.</p>
+                    <p class="text-rose-500 font-semibold">Doing this takes a massive factory, a lot of electricity, and giant supercomputers. It's too expensive!</p>
+                `,
+                math: null,
+                visual: `
+                    <div class="relative flex items-center justify-center w-full h-full">
+                        <div class="text-[120px] md:text-[180px] animate-shake z-10 opacity-80 filter grayscale brightness-75">🤖</div>
+                        <div class="absolute text-7xl animate-spin z-20" style="animation-duration: 3s; top: 20%; left: 20%;">⚙️</div>
+                        <div class="absolute text-6xl animate-spin z-20" style="animation-duration: 2s; animation-direction: reverse; bottom: 30%; right: 20%;">⚙️</div>
+                        <div class="absolute bottom-10 left-10 text-6xl animate-pulse">🔥</div>
+                        <div class="absolute top-10 right-10 text-6xl animate-pulse">💻</div>
+                    </div>
+                `
+            },
+            {
+                badge: "Step 3",
+                title: "The Safe: Freezing the Brain 🧊",
+                description: `
+                    <p>This is where <strong>PEFT</strong> and <strong>LoRA</strong> come in to save the day!</p>
+                    <p>Instead of taking the giant brain apart, you decide to put the brain inside a safe where it can't be touched.</p>
+                    <p>We call this a <strong>Frozen Base Model</strong> (because it is locked and frozen in place). Its main knowledge stays completely safe and unchanged.</p>
+                `,
+                math: null,
+                visual: `
+                    <div class="relative flex items-center justify-center w-full h-full">
+                        <div class="relative z-10">
+                            <!-- Safe/Ice box -->
+                            <div class="absolute inset-0 bg-blue-100/40 backdrop-blur-sm border-4 border-blue-400 rounded-3xl animate-glow shadow-[0_0_50px_rgba(59,130,246,0.3)] z-20 flex items-center justify-center">
+                                <span class="absolute top-4 right-4 text-3xl">🔒</span>
+                            </div>
+                            <div class="text-[120px] md:text-[180px] filter saturate-50 p-8">🤖</div>
+                        </div>
+                        <div class="absolute bottom-10 right-10 text-6xl animate-float">🧊</div>
+                    </div>
+                `
+            },
+            {
+                badge: "Step 4",
+                title: "LoRA: The Tiny Backpack 🎒",
+                description: `
+                    <p>Then, you take a tiny little memory chip like a small backpack and just snap it onto the robot's back. This tiny backpack is called <strong>LoRA</strong>.</p>
+                    <p>Inside that tiny backpack are all the special instructions on how to be a clown.</p>
+                    <p>Mathematically, instead of changing the massive frozen brain matrix ($W_0$), we just add a small, efficient new matrix factor ($B \\times A$).</p>
+                `,
+                math: `
+                    $$ \\text{New Brain} = \\text{Frozen Brain} + \\text{Tiny Backpack} $$
+                    <br>
+                    $$ W_{\\text{new}} = W_0 + \\Delta W $$
+                    <br>
+                    $$ W_{\\text{new}} = W_0 + B \\times A $$
+                `,
+                visual: `
+                    <div class="relative flex items-center justify-center w-full h-full">
+                        <div class="relative z-10 flex items-center">
+                            <div class="text-[120px] md:text-[150px] opacity-50 relative">
+                                🤖
+                                <div class="absolute inset-0 bg-blue-200/20 backdrop-blur-sm rounded-3xl border-2 border-blue-400/50"></div>
+                            </div>
+                            <!-- Backpack snapping on -->
+                            <div class="text-[80px] md:text-[100px] animate-glow transform -translate-x-8 z-20 hover:scale-110 transition-transform cursor-pointer">
+                                🎒
+                            </div>
+                        </div>
+                        <!-- Sparkles -->
+                        <div class="absolute top-1/4 right-1/4 text-4xl animate-pulse">✨</div>
+                        <div class="absolute bottom-1/3 left-1/3 text-3xl animate-pulse" style="animation-delay: 0.5s;">🌟</div>
+                    </div>
+                `
+            },
+            {
+                badge: "Step 5",
+                title: "Working Together 🤝",
+                description: `
+                    <p>Now, when you talk to the robot, here is how it processes your words:</p>
+                    <ol class="list-decimal list-inside space-y-2 mt-4 text-slate-700">
+                        <li>It uses its <strong>giant locked brain</strong> to understand the complicated words you are saying.</li>
+                        <li>It quickly checks its <strong>tiny backpack (LoRA)</strong> to remember exactly how to make the answer sound funny.</li>
+                    </ol>
+                    <p class="mt-4">The output is generated by combining the knowledge from both!</p>
+                `,
+                math: `
+                    $$ h = W_0 x + B A x $$
+                    <p class="text-sm text-slate-500 mt-2">Where $x$ is your question, and $h$ is the robot's clown response!</p>
+                `,
+                visual: `
+                    <div class="relative flex flex-col items-center justify-center w-full h-full">
+                        <div class="flex items-center">
+                            <div class="text-[100px] md:text-[130px] relative z-10">🤖</div>
+                            <div class="text-[60px] md:text-[80px] -translate-x-6 z-20">🎒</div>
+                        </div>
+
+                        <!-- Output stream -->
+                        <div class="mt-8 flex flex-col items-center animate-float">
+                            <div class="w-1 bg-blue-400 h-8 mb-2 opacity-50"></div>
+                            <div class="bg-white border-2 border-blue-400 rounded-2xl p-4 shadow-lg shadow-blue-500/20 text-center">
+                                <div class="text-3xl mb-1">🤡</div>
+                                <div class="text-sm font-bold text-blue-700">"Honk Honk! Here's a joke!"</div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                badge: "Step 6",
+                title: "Real-World Superpower ⚡",
+                description: `
+                    <p>Why is this awesome in the real world?</p>
+                    <p>Because building the tiny backpack takes almost <strong>zero energy</strong> compared to rebuilding the giant brain! You can teach the robot a new trick using just a normal computer at home.</p>
+                    <p>Plus, if you want the robot to act like a pirate tomorrow, you just take off the clown backpack and snap on a pirate backpack! 🏴‍☠️</p>
+                `,
+                math: null,
+                visual: `
+                    <div class="relative flex flex-col items-center justify-center w-full h-full gap-8">
+                        <div class="flex items-center justify-center gap-12 w-full">
+                            <!-- Setup 1 -->
+                            <div class="flex flex-col items-center">
+                                <div class="flex items-center text-[70px] md:text-[90px]">
+                                    🤖<span class="-translate-x-4">🎒</span>
+                                </div>
+                                <div class="text-2xl mt-2">🤡</div>
+                            </div>
+
+                            <!-- Arrow -->
+                            <div class="text-4xl text-slate-400 animate-pulse">➡️</div>
+
+                            <!-- Setup 2 -->
+                            <div class="flex flex-col items-center">
+                                <div class="flex items-center text-[70px] md:text-[90px]">
+                                    🤖<span class="-translate-x-4">🎒</span>
+                                </div>
+                                <div class="text-2xl mt-2">🏴‍☠️</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 flex gap-4 text-4xl">
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:-translate-y-2 transition-transform">🎒<span class="text-lg">🤡</span></div>
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:-translate-y-2 transition-transform">🎒<span class="text-lg">🏴‍☠️</span></div>
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:-translate-y-2 transition-transform">🎒<span class="text-lg">👨‍⚕️</span></div>
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        // --- STATE & LOGIC ---
+        let currentStep = 0;
+
+        // DOM Elements
+        const elVisualContainer = document.getElementById('visualContainer');
+        const elContentArea = document.getElementById('contentArea');
+        const elBadge = document.getElementById('stepBadge');
+        const elTitle = document.getElementById('stepTitle');
+        const elDesc = document.getElementById('stepDescription');
+        const elMath = document.getElementById('mathArea');
+        const elPrevBtn = document.getElementById('prevBtn');
+        const elNextBtn = document.getElementById('nextBtn');
+        const elProgressDots = document.getElementById('progressDots');
+
+        // Initialize App
+        function init() {
+            // Create progress dots
+            tutorialSteps.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.className = `w-3 h-3 rounded-full transition-all duration-300 ${index === 0 ? 'bg-blue-500 w-8' : 'bg-slate-300'}`;
+                dot.id = `dot-${index}`;
+                elProgressDots.appendChild(dot);
+            });
+
+            // Event Listeners
+            elPrevBtn.onclick = () => changeStep(-1);
+            // Next button onclick is dynamically handled inside renderStep()
+
+            // Initial Render
+            renderStep(currentStep);
+        }
+
+        // Handle Step Change
+        function changeStep(direction) {
+            const newStep = currentStep + direction;
+            if (newStep >= 0 && newStep < tutorialSteps.length) {
+                currentStep = newStep;
+
+                // Add tiny animation to content area
+                elContentArea.classList.remove('step-enter');
+                void elContentArea.offsetWidth; // trigger reflow
+                elContentArea.classList.add('step-enter');
+
+                renderStep(currentStep);
+            }
+        }
+
+        // Render specific step data
+        function renderStep(index) {
+            const stepData = tutorialSteps[index];
+
+            // Update Text Data
+            elBadge.innerText = stepData.badge;
+            elTitle.innerText = stepData.title;
+            elDesc.innerHTML = stepData.description;
+
+            // Render inline LaTeX inside the description text
+            renderMathInElement(elDesc, {
+                delimiters: [
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false }
+                ],
+                throwOnError: false
+            });
+
+            // Update Visuals
+            elVisualContainer.innerHTML = stepData.visual;
+
+            // Update Math Area using KaTeX
+            if (stepData.math) {
+                elMath.innerHTML = stepData.math;
+                elMath.classList.remove('hidden');
+                // Render the LaTeX formulas
+                renderMathInElement(elMath, {
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false }
+                    ],
+                    throwOnError: false
+                });
+            } else {
+                elMath.classList.add('hidden');
+                elMath.innerHTML = '';
+            }
+
+            // Update Buttons State
+            elPrevBtn.disabled = index === 0;
+            if (index === tutorialSteps.length - 1) {
+                elNextBtn.innerHTML = `Finish <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+                elNextBtn.classList.remove('bg-blue-600', 'hover:bg-blue-500');
+                elNextBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-500', 'shadow-emerald-600/20');
+            } else {
+                elNextBtn.innerHTML = `Next <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>`;
+                elNextBtn.classList.add('bg-blue-600', 'hover:bg-blue-500');
+                elNextBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-500', 'shadow-emerald-600/20');
+            }
+
+            // End tutorial hack
+            if (index === tutorialSteps.length - 1) {
+                // elNextBtn.onclick = () => {
+                //     currentStep = 0;
+                //     renderStep(0);
+                // }
+            } else {
+                elNextBtn.onclick = () => changeStep(1);
+            }
+
+            // Update Progress Dots
+            tutorialSteps.forEach((_, i) => {
+                const dot = document.getElementById(`dot-${i}`);
+                if (i === index) {
+                    dot.className = 'w-8 h-3 bg-blue-500 rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(59,130,246,0.5)]';
+                } else {
+                    dot.className = 'w-3 h-3 bg-slate-300 rounded-full transition-all duration-300';
+                }
+            });
+        }
+
+        // Start Application
+        window.onload = init;
+    </script>
+</body>
+
+</html>
