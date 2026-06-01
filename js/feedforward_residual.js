@@ -85,7 +85,7 @@ const steps = [
                 </div>
             </div>
         `,
-        text: "1. Words enter.<br>2. AI mixes them to find patterns (Attention).<br>3. A safe copy skips the line so nothing is lost (Residual).<br>4. AI goes to a quiet room to think hard and polish (Feed Forward).<br><i>It does this over and over until it knows exactly how to answer!</i>",
+        text: "1. Words enter.<br>2. AI mixes them to find patterns (Attention).<br>3. A safe copy skips the line so nothing is lost (Residual).<br>4. AI takes all those new patterns into a quiet room to think hard and polish (Feed Forward).<br><i>It does this over and over until it knows exactly how to answer!</i>",
         formula: "\\text{Output} = \\text{LayerNorm}(z + \\text{FFN}(z))"
     }
 ];
